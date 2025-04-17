@@ -1,0 +1,111 @@
+---
+title: "STA135_Discussion 2"
+author: "Yichen Hu"
+date: "2025-04-15"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+First we input the data.
+```{r}
+mu = c(-2,3,-1,5)
+sigma = matrix(c(11,-8,3,9,-8,9,-3,6,3,-3,2,3,9,6,3,9),4,4)
+```
+
+Here we use the fact that if $X\sim\mathcal{N}_d(\mu,\Sigma)$, for $A\in\mathbb{R}^{k\times d}$, $AX\sim\mathcal{N}_k(A\mu,A\Sigma A^T)$.
+
+### (a)
+```{r}
+A = t(c(4,-2,1,-3))
+A%*%mu
+A%*%sigma%*%t(A)
+```
+
+### (b)
+```{r}
+A = rbind(c(1,1,1,1),c(-2,3,1,-2))
+A%*%mu
+A%*%sigma%*%t(A)
+```
+
+### (c)
+```{r}
+A = rbind(c(3,1,-4,-1),c(-1,-3,1,-2),c(2,2,4,-5))
+A%*%mu
+A%*%sigma%*%t(A)
+```
+
+### (d)
+```{r}
+A = t(c(0,0,1,0))
+A%*%mu
+A%*%sigma%*%t(A)
+```
+
+### (e)
+```{r}
+A = rbind(c(0,1,0,0),c(0,0,0,1))
+A%*%mu
+A%*%sigma%*%t(A)
+```
+
+### (f)
+```{r}
+A = rbind(c(1,0,0,0),c(1/2,1/2,0,0),c(1/3,1/3,1/3,0),c(1/4,1/4,1/4,1/4))
+round(A%*%mu,3)
+A%*%sigma%*%t(A)
+```
+
+## Problem 2
+In this problem, we utilize the fact that if $X\in\mathbb{R}^m,Y\in\mathbb{R}^n$ and
+$$
+\begin{pmatrix}
+X\\Y
+\end{pmatrix}\sim\mathcal{N}_{m+n}\left(
+\begin{pmatrix}
+\mu_x\\\mu_y
+\end{pmatrix},\begin{pmatrix}
+\Sigma_{xx},\Sigma_{xy}\\
+\Sigma_{yx},\Sigma_{yy}
+\end{pmatrix}
+\right)
+$$
+we therefore have 
+$$Y|X\sim\mathcal{N}_n(\mu_y+\Sigma_{yx}\Sigma_{xx}^{-1}(X-\mu_x),\Sigma_{yy}-\Sigma_{yx}\Sigma_{xx}^{-1}\Sigma_{xy})$$
+
+This formula is complicated. Please write it in your cheat sheet in exams!
+
+Some rule of thumb to memorize. Since you are actually get the distribution of $Y$, the conditional mean and covariance should be the same dimension as that of $Y$. Look at $\Sigma_{yx}\Sigma_{xx}^{-1}\Sigma_{xy}$, you can think of $x$'s here are cancelled out and remember that our conditional covariance will be reduced so the sign is negative. For the mean part, similarly, in $\Sigma_{yx}\Sigma_{xx}^{-1}(X-\mu_x)$, $x$'s are cancelled out, there is one $x$ in $\Sigma_{yx}$, two reciprocal of $x$ in $\Sigma_{xx}^{-1}$ and one $x$ in $(X-\mu_x)$.
+
+
+Then we input the data
+```{r}
+mu_y = c(3,-2)
+mu_x = c(4,-3,5)
+sigma_yy = rbind(c(14,-8),c(-8,18))
+sigma_yx = matrix(c(15,8,0,6,3,-2),2,3)
+sigma_xy = t(sigma_yx)
+sigma_xx = cbind(c(50,8,5),c(8,4,0),c(5,0,1))
+```
+
+### (a)
+```{r}
+sigma_yx%*%solve(sigma_xx)
+mu_y-sigma_yx%*%solve(sigma_xx)%*%mu_x
+```
+
+So we have
+
+$$\mathbb{E}(Y|X)=\begin{pmatrix}-12\\22.5\end{pmatrix}+\begin{pmatrix}0&0&3\\2/3&5/3&-16/3\end{pmatrix}X$$
+
+### (b)
+```{r}
+sigma_yy-sigma_yx%*%solve(sigma_xx)%*%sigma_xy
+```
