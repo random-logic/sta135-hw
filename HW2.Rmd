@@ -1,0 +1,78 @@
+---
+title: "HW2"
+author: "Andrew Jowe"
+date: "2025-05-02"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# 1
+### (a)
+```{r}
+A <- t(c(1, 1, 0))
+mu <- c(0, 0, 0)
+Sigma <- rbind(
+  c(2, 1, 0),
+  c(1, 4, 0),
+  c(0, 0, 5)
+)
+
+z_mu <- A %*% mu
+z_Sigma <- A %*% Sigma %*% t(A)
+```
+
+$$z \sim N(`r z_mu`, `r z_Sigma`)$$
+
+### (b)
+$$A = \begin{bmatrix}
+  2 & c & 0 \\
+\end{bmatrix}$$
+
+$$B = \begin{bmatrix}
+  2 & 0 & c \\
+\end{bmatrix}$$
+
+Note that $z_1$, $z_2$ are independent if and only if $Cov(z_1, z_2) = A \Sigma B^T = 0$.
+
+Using Wolfram Alpha, we can see that:
+$$A \Sigma B^T = 8 + 2c = 0$$
+$$2c = -8$$
+$$c = -4$$
+
+# 2
+### (a)
+```{r}
+data <- data.frame(
+  y_1 = c(51, 27, 37, 42, 27, 43, 41, 38, 36, 26, 29),
+  y_2 = c(36, 20, 22, 36, 18, 32, 22, 21, 23, 31, 20),
+  y_3 = c(50, 26, 41, 32, 33, 43, 36, 31, 27, 31, 25),
+  y_4 = c(35, 17, 37, 34, 14, 35, 25, 20, 25, 32, 26),
+  y_5 = c(42, 27, 30, 27, 29, 40, 38, 16, 28, 36, 25)
+)
+mu_0 <- c(30, 25, 40, 25, 30)
+
+n <- nrow(data)
+p <- ncol(data)
+y_bar <- colMeans(data)
+S <- cov(data)
+T2 <- n * t(y_bar - mu_0) %*% solve(S) %*% (y_bar - mu_0)
+```
+
+$$T^2 = `r round(T2, 4)`$$
+
+### (b)
+```{r}
+alpha <- 0.05
+F_critical <- qf(1 - alpha, p, n - p)
+T_critical <- ((p * (n - 1)) / (n - p)) * F_critical
+```
+
+Our critical F value is $`r round(F_critical, 4)`$. Our critical $T^2$ value is `r round(T_critical, 4)`.
+
+### (c)
+```{r}
+F_stat <- ((n - p) / (p * (n - 1))) * T2
+```
+
+Our F-statistic is $`r round(F_stat, 4)`$, which is `r if (F_stat > F_critical) "greater than" else "less than or equal to"` our critical F value. Therefore, we should `r if (F_stat > F_critical) "reject" else "accept"` our null hypothesis.

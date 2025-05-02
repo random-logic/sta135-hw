@@ -1,3 +1,3 @@
-input <- 'HW1.rmd'
-output <- 'HW1.pdf'
+input <- 'HW2.rmd'
+output <- 'HW2.pdf'
 rmarkdown::render(input = input, output_file = output)
