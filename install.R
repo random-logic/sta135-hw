@@ -1,1 +1,1 @@
-install.packages("ISLR")
+install.packages("MASS")
