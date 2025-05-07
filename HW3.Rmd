@@ -28,7 +28,6 @@ Where:
 
 ### (b)
 ```{r}
-library(MASS)
 library(Hotelling)
 ```
 
@@ -98,26 +97,24 @@ Since our p-value is `r if (result$pval < alpha) "less than" else "equal to or g
 
 # 2
 ### (a)
-TODO: wait for Tuesday's discussion to finish this so we can cross check if we used the right formula
-
-We will the likelihood ratio test (LRT) to test whether the covariance matrix of a bivariate dataset is equal to a given matrix. The formula is:
+We will use the Modified Likelihood Ratio (MLR) to test whether the covariance matrix of a bivariate dataset is equal to a given matrix. The formula is:
 
 $$
-\Lambda = \left( \frac{|\Sigma_0|}{|S|} \right)^{n/2} \exp\left( -\frac{n}{2} \left[ \text{tr}(\Sigma_0^{-1}S) - p \right] \right)
+u = (n - 1) \left[ \operatorname{tr}(S \Sigma_0^{-1}) - \log \det(S \Sigma_0^{-1}) - p \right]
 $$
 
-This is commonly transformed into a chi-square approximation for practical use:
+Alternatively, let $\lambda_1, \dots, \lambda_p$ be the eigenvalues of $S \Sigma_0^{-1}$, then the test statistic can also be written as:
 
 $$
--2 \ln \Lambda \sim \chi^2_{\frac{1}{2}p(p+1)} \quad \text{under } H_0
+u = (n - 1) \sum_{i=1}^p \left( \lambda_i - \log \lambda_i - 1 \right)
 $$
 
 Where:
 
-- $\Sigma_0$ is the hypothesized covariance matrix
 - $S$ is the sample covariance matrix
+- $\Sigma_0$ is the hypothesized covariance matrix under $H_0$
 - $n$ is the sample size
-- $p = 2$ is the dimension
+- $p$ is the dimension (number of variables)
 
 ### (b)
 ```{r}
@@ -148,8 +145,35 @@ data <- matrix(c(
 # Convert matrices to data frames
 df <- as.data.frame(data)
 colnames(df) <- c("x", "y")
-df
+
+S <- cov(df)
+
+Sigma0 <- matrix(c(
+  20, 100,
+  100, 1000
+), nrow = 2)
+
+eigenvalues <- eigen(S %*% solve(Sigma0))$values
+u <- (nrow(df) - 1) * sum(eigenvalues - log(eigenvalues) - 1)
 ```
 
+Our MLR statistic is $`r round(u, 4)`$.
+
+### (c)
+From lecture 9, $u$ is asymptotically a Chi-squared distribution with degrees of freedom $\frac{1}{2} p (p + 1)$.
+
+So, we reject $H_0$ if:
+
+$$u > \chi^2_{1 - \alpha, \frac{1}{2} p (p + 1)}$$
+
+```{r}
+alpha <- 0.05
+p <- ncol(df)
+critical_value <- qchisq(1 - alpha, 1 / 2 * p * (p + 1))
+```
+
+Our critical value is $`r round(critical_value, 4)`$.
+
+Since our test statistic is `r if (u > critical_value) 'greater than' else 'equal to or less than'` our critical value, we `r if (u > critical_value) 'reject' else 'accept'` the null hypothesis.
+
 # 3
-TODO
