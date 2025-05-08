@@ -1,0 +1,59 @@
+# Discussion 5
+
+# 1.
+mydata <- t(matrix(c(47.8,48.8,49.0,49.7,
+46.4,47.3,47.7,48.4,
+46.3,46.8,47.8,48.5,
+45.1,45.3,46.1,47.2,
+47.6,48.5,48.9,49.3,
+52.5,53.2,53.3,53.7,
+51.2,53.0,54.3,54.5,
+49.8,50.0,50.3,52.7,
+48.1,50.8,52.3,54.4,
+45.0,47.0,47.3,48.3,
+51.2,51.4,51.6,51.9,
+48.5,49.2,53.0,55.5,
+52.1,52.8,53.7,55.0,
+48.2,48.9,49.3,49.8,
+49.6,50.4,51.2,51.8,
+50.7,51.7,52.7,53.3,
+47.2,47.7,48.4,49.5,
+53.3,54.6,55.1,55.3,
+46.2,47.5,48.1,48.4,
+46.3,47.6,51.3,51.8),4,20))
+mydata
+
+S <- cov(mydata)
+
+eigen(S)
+eigen(S)$values #*
+eigen(S)$vectors
+val <- eigen(S)$values
+val
+
+n <- dim(mydata)[1]
+p <- dim(mydata)[2]
+
+h <- p^p*prod(val)/(sum(val)^p)
+LR <- h^{n/2}
+test_sta <- -2*log(LR)
+#test_sta <- -n*log(h)
+test_sta
+qchisq(0.95,n-1)
+# reject the null hypothesis
+
+#——————————————————————————————
+C <- matrix(c(1,1,0,-1,0,1,1,-1,0,-1,0,-1),3,4)
+C
+W <- C%*%S%*%t(C)
+
+val <- eigen(W)$values
+val
+
+h <- (p-1)^(p-1)*prod(val)/(sum(val)^(p-1))
+LR <- h^{n/2}
+test_sta <- -2*log(LR)
+#test_sta <- -n*log(h)
+test_sta
+qchisq(0.95,n-1)
+# still reject the null hypothesis
