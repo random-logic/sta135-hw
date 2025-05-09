@@ -200,46 +200,47 @@ Where:
 - $p$ is the number of variables (dimensions),
 - $n$ is the sample size.
 
+We can use Eigenvalues to solve the following:
+$$\prod \lambda_i = det(S)$$
+$$\sum \lambda_i = tr(S)$$
+
 ### (b)
 ```{r}
-data <- matrix(c(
-  47.8, 48.8, 49.0, 49.7,
-  46.4, 47.3, 47.7, 48.4,
-  46.3, 46.3, 47.8, 48.5,
-  45.1, 45.3, 46.1, 47.2,
-  47.6, 48.5, 48.9, 49.3,
-  52.5, 53.2, 53.3, 53.7,
-  51.2, 53.0, 54.3, 54.5,
-  49.8, 50.0, 50.3, 52.7,
-  48.1, 50.8, 52.3, 54.4,
-  45.0, 47.0, 47.0, 48.3,
-  51.2, 51.4, 51.6, 51.9,
-  48.5, 49.2, 53.0, 55.5,
-  52.1, 52.8, 53.7, 55.0,
-  48.2, 49.4, 50.1, 49.8,
-  49.6, 50.4, 51.2, 51.8,
-  50.7, 51.7, 52.7, 53.5,
-  51.2, 52.0, 53.3, 54.1,
-  53.3, 54.6, 55.1, 55.3,
-  46.2, 47.1, 48.3, 51.4,
-  46.3, 47.6, 51.3, 51.8
-), nrow = 20, byrow = TRUE)
+mydata <- t(matrix(c(47.8,48.8,49.0,49.7,
+46.4,47.3,47.7,48.4,
+46.3,46.8,47.8,48.5,
+45.1,45.3,46.1,47.2,
+47.6,48.5,48.9,49.3,
+52.5,53.2,53.3,53.7,
+51.2,53.0,54.3,54.5,
+49.8,50.0,50.3,52.7,
+48.1,50.8,52.3,54.4,
+45.0,47.0,47.3,48.3,
+51.2,51.4,51.6,51.9,
+48.5,49.2,53.0,55.5,
+52.1,52.8,53.7,55.0,
+48.2,48.9,49.3,49.8,
+49.6,50.4,51.2,51.8,
+50.7,51.7,52.7,53.3,
+47.2,47.7,48.4,49.5,
+53.3,54.6,55.1,55.3,
+46.2,47.5,48.1,48.4,
+46.3,47.6,51.3,51.8),4,20))
+mydata
 
-# Convert Matrix to DataFrame
-df <- as.data.frame(data)
-colnames(df) <- c("Age_8", "Age_8.5", "Age_9", "Age_9.5")
+S <- cov(mydata)
 
-# (b) Compute the test statistic
-S <- cov(df)  # Sample covariance matrix
-p <- ncol(df) # Number of variables
-n <- nrow(df) # Sample size
+eigen_vals <- eigen(S)$values
 
-det_S <- det(S)
-trace_S <- sum(diag(S))
-lambda <- (det_S / ( (trace_S / p)^p ))^(n / 2)
+n <- dim(mydata)[1]
+p <- dim(mydata)[2]
+
+h <- p^p*prod(eigen_vals)/(sum(eigen_vals)^p)
+LR <- h^{n/2}
+test_sta <- -2*log(LR)
 ```
 
-Our LR statistic is $`r formatC(lambda, format="e", digits=4)`$.
+Our LR statistic is $`r round(test_sta, 4)`$.
 
 ### (c)
 We want to reject the null if:
@@ -248,11 +249,10 @@ $$-2 ln(\Lambda) > \chi^2_{1 - \alpha, n - 1}$$
 
 ```{r}
 alpha <- 0.05
-chi_test_stat <- -2 * log(lambda)
 critical_value <- qchisq(1 - alpha, n - 1)
 ```
 
 Solving for the above equation:
-$$`r round(chi_test_stat, 4)` `r if (chi_test_stat > critical_value) '>' else '<='` `r round(critical_value, 4)`$$
+$$`r round(test_sta, 4)` `r if (test_sta > critical_value) '>' else '<='` `r round(critical_value, 4)`$$
 
-Which means that we `r if (chi_test_stat > critical_value) 'reject' else 'accept'` the null hypothesis.
+Which means that we `r if (test_sta > critical_value) 'reject' else 'accept'` the null hypothesis.

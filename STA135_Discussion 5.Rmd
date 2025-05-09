@@ -1,3 +1,4 @@
+```{r}
 # Discussion 5
 
 # 1.
@@ -57,3 +58,4 @@ test_sta <- -2*log(LR)
 test_sta
 qchisq(0.95,n-1)
 # still reject the null hypothesis
+```
